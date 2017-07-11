@@ -19,6 +19,7 @@ namespace Orleans.DiagnosticSource.Tests
         {
 
             var activity = new Activity("Activity_should_flow_from_client_to_grain")
+                .AddBaggage("bag1","val1")
                 .Start();
 
             try
@@ -35,6 +36,7 @@ namespace Orleans.DiagnosticSource.Tests
         public async Task Activity_should_flow_from_grain_to_grain()
         {
             var activity = new Activity("Activity_should_flow_from_client_to_grain")
+                .AddBaggage("bag2", "val2")
                 .Start();
 
             try

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans.CodeGeneration;
 using Orleans.Runtime;
@@ -33,27 +34,14 @@ namespace Orleans.DiagnosticSource.Client
             if (currentActivity != null)
             {
                 RequestContext.Set(DiagnosticsLoggingStrings.RequestIdHeaderName, currentActivity.Id);
-                //we expect baggage to be empty or contain a few items
-                using (IEnumerator<KeyValuePair<string, string>> e = currentActivity.Baggage.GetEnumerator())
+                // we expect baggage to be empty or contain a few items
+                var baggage = currentActivity.Baggage.ToArray();
+                if (baggage.Length > 0)
                 {
-                    if (e.MoveNext())
-                    {
-                        var baggage = new List<string>();
-                        do
-                        {
-                            KeyValuePair<string, string> item = e.Current;
-                            if (!string.IsNullOrEmpty(item.Value))
-                            {
-                                baggage.Add(item.Key + "=" + item.Value);
-                            }
-                            baggage.Add(item.Key);
-                        }
-                        while (e.MoveNext());
-                        RequestContext.Set(DiagnosticsLoggingStrings.CorrelationContextHeaderName, baggage);
-                    }
+                    RequestContext.Set(DiagnosticsLoggingStrings.CorrelationContextHeaderName, baggage);
                 }
             }
-            
+
         }
     }
 }

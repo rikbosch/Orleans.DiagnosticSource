@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans.Runtime;
@@ -12,9 +13,8 @@ namespace Orleans.DiagnosticSource.Tests
         public async Task TestGrainToGrain()
         {
             var activity = Activity.Current;
-
-            var context = RequestContext.Export(ServiceProviderServiceExtensions.GetService<SerializationManager>(this.ServiceProvider));
             activity.ShouldNotBeNull();
+            activity.Baggage.Any(x => x.Value == "val2" && x.Key == "bag2").ShouldBeTrue();
 
             if (this.GetPrimaryKeyLong() == 5)
             {
@@ -29,6 +29,7 @@ namespace Orleans.DiagnosticSource.Tests
         {
             var activity = Activity.Current;
 
+            activity.Baggage.Any(x=>x.Value== "val1" && x.Key=="bag1").ShouldBeTrue();
             activity.ShouldNotBeNull();
             activity.ParentId.ShouldBe(activityId);
         }
