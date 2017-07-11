@@ -16,7 +16,11 @@ namespace Orleans.DiagnosticSource.Tests
             var context = RequestContext.Export(ServiceProviderServiceExtensions.GetService<SerializationManager>(this.ServiceProvider));
             activity.ShouldNotBeNull();
 
-
+            if (this.GetPrimaryKeyLong() == 5)
+            {
+                // prevent overflow...
+                return;
+            }
 
             await this.GrainFactory.GetGrain<ITestGrain>(5).TestGrainToGrain();
         }
